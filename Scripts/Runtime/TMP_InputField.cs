@@ -1529,7 +1529,6 @@ namespace TMPro
 
                     if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
                     {
-                        m_ReleaseSelection = true;
                         //m_WasCanceled = true;
                         SendTouchScreenKeyboardStatusChanged();
                     }
