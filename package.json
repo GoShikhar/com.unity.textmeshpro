@@ -17,7 +17,7 @@
     "com.unity.ugui": "1.0.0"
   },
   "repository": {
-    "url": "https://github.cds.internal.unity3d.com/unity/com.unity.textmeshpro.git",
+    "url": "https://github.com/GoShikhar/com.unity.textmeshpro.git",
     "type": "git",
     "revision": "648406226df6c4f28a0f64eaab42ddc3db70c475"
   },
