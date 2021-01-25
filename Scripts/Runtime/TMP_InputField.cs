@@ -1541,6 +1541,7 @@ namespace TMPro
                 return;
             }
             Debug.Log("text = " + text);
+            Debug.Log("m_Text xx = " + m_Text);
 
             string val = m_SoftKeyboard.text;
             Debug.Log("m_SoftKeyboard.val = " + val);
@@ -1597,7 +1598,7 @@ namespace TMPro
             {
                 UpdateStringPositionFromKeyboard();
             }
-
+            Debug.Log("m_Text yy = " + m_Text);
             //else if (m_HideMobileInput) // m_Keyboard.canSetSelection
             //{
             //    int length = stringPositionInternal < stringSelectPositionInternal ? stringSelectPositionInternal - stringPositionInternal : stringPositionInternal - stringSelectPositionInternal;
@@ -1615,6 +1616,7 @@ namespace TMPro
 
                 OnDeselect(null);
             }
+            Debug.Log("m_Text zz = " + m_Text);
         }
 
         private bool MayDrag(PointerEventData eventData)
