@@ -313,7 +313,6 @@ namespace TMPro
         private Coroutine m_BlinkCoroutine = null;
         private float m_BlinkStartTime = 0.0f;
         private Coroutine m_DragCoroutine = null;
-        private string m_OriginalText = "";
         private bool m_WasCanceled = false;
         private bool m_HasDoneFocusTransition = false;
         private WaitForSecondsRealtime m_WaitForSecondsRealtime;
@@ -517,6 +516,8 @@ namespace TMPro
 
         void SetText(string value, bool sendCallback = true)
         {
+            Debug.Log("value 1 : " + value);
+            Debug.Log("this.text : " + this.text);
             if (this.text == value)
                 return;
 
@@ -4074,7 +4075,6 @@ namespace TMPro
             }
 
             m_AllowInput = true;
-            m_OriginalText = text;
             m_WasCanceled = false;
             SetCaretVisible();
             UpdateLabel();
