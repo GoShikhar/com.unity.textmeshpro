@@ -2009,6 +2009,7 @@ namespace TMPro
                 // Submit
                 case KeyCode.Return:
                 case KeyCode.KeypadEnter:
+                case KeyCode.Escape:
                     {
                         if (lineType != LineType.MultiLineNewline)
                         {
@@ -2016,13 +2017,6 @@ namespace TMPro
                             return EditState.Finish;
                         }
                         break;
-                    }
-
-                case KeyCode.Escape:
-                    {
-                        m_ReleaseSelection = true;
-                        // m_WasCanceled = true;
-                        return EditState.Finish;
                     }
             }
 
