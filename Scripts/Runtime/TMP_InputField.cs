@@ -1518,7 +1518,11 @@ namespace TMPro
                 if (m_SoftKeyboard != null)
                 {
                     if (!m_ReadOnly)
+                    {
                         text = m_SoftKeyboard.text;
+                        Debug.Log("text prev = " + text);
+
+                    }
 
                     if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.LostFocus)
                         SendTouchScreenKeyboardStatusChanged();
@@ -4135,6 +4139,8 @@ namespace TMPro
             {
                 //if (m_WasCanceled && m_RestoreOriginalTextOnEscape)
                 //    text = m_OriginalText;
+                if (m_WasCanceled)
+                    text = this.text;
                 Debug.Log("text: " + text);
                 if (m_SoftKeyboard != null)
                 {
