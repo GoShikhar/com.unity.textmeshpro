@@ -558,7 +558,7 @@ namespace TMPro
                 return;
             }
 #endif
-
+            Debug.Log("m_Text 1 : " + m_Text);
             if (m_SoftKeyboard != null)
                 m_SoftKeyboard.text = m_Text;
 
@@ -1540,8 +1540,10 @@ namespace TMPro
                 OnDeselect(null);
                 return;
             }
+            Debug.Log("text = " + text);
 
             string val = m_SoftKeyboard.text;
+            Debug.Log("m_SoftKeyboard.val = " + val);
 
             if (m_Text != val)
             {
