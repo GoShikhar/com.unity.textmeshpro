@@ -313,7 +313,8 @@ namespace TMPro
         private Coroutine m_BlinkCoroutine = null;
         private float m_BlinkStartTime = 0.0f;
         private Coroutine m_DragCoroutine = null;
-        //private bool m_WasCanceled = false;
+        private string m_OriginalText = "";
+        private bool m_WasCanceled = false;
         private bool m_HasDoneFocusTransition = false;
         private WaitForSecondsRealtime m_WaitForSecondsRealtime;
         private bool m_PreventCallback = false;
@@ -396,7 +397,7 @@ namespace TMPro
 
             set
             {
-                switch (Application.platform)
+                switch(Application.platform)
                 {
                     case RuntimePlatform.Android:
                     case RuntimePlatform.IPhonePlayer:
@@ -506,7 +507,6 @@ namespace TMPro
             }
         }
 
-        string mOnSelectString = null;
         /// <summary>
         /// Set Input field's current text value without invoke onValueChanged. This is not necessarily the same as what is visible on screen.
         /// </summary>
@@ -517,15 +517,8 @@ namespace TMPro
 
         void SetText(string value, bool sendCallback = true)
         {
-            Debug.Log("value 1 : " + value);
-            Debug.Log("this.text : " + this.text);
             if (this.text == value)
                 return;
-
-            if (mOnSelectString == value)
-            {
-                return;
-            }
 
             if (value == null)
                 value = "";
@@ -558,14 +551,14 @@ namespace TMPro
             }
             */
 
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             if (!Application.isPlaying)
             {
                 SendOnValueChangedAndUpdateLabel();
                 return;
             }
-#endif
-            Debug.Log("m_Text 1 : " + m_Text);
+            #endif
+
             if (m_SoftKeyboard != null)
                 m_SoftKeyboard.text = m_Text;
 
@@ -820,7 +813,7 @@ namespace TMPro
         public TMP_InputValidator inputValidator
         {
             get { return m_InputValidator; }
-            set { if (SetPropertyUtility.SetClass(ref m_InputValidator, value)) SetToCustom(CharacterValidation.CustomValidator); }
+            set {  if (SetPropertyUtility.SetClass(ref m_InputValidator, value)) SetToCustom(CharacterValidation.CustomValidator); }
         }
         [SerializeField]
         protected TMP_InputValidator m_InputValidator = null;
@@ -833,7 +826,7 @@ namespace TMPro
         public bool multiLine { get { return m_LineType == LineType.MultiLineNewline || lineType == LineType.MultiLineSubmit; } }
         // Not shown in Inspector.
         public char asteriskChar { get { return m_AsteriskChar; } set { if (SetPropertyUtility.SetStruct(ref m_AsteriskChar, value)) UpdateLabel(); } }
-        //public bool wasCanceled { get { return m_WasCanceled; } }
+        public bool wasCanceled { get { return m_WasCanceled; } }
 
 
         protected void ClampStringPos(ref int pos)
@@ -972,7 +965,7 @@ namespace TMPro
         }
 
 
-#if UNITY_EDITOR
+        #if UNITY_EDITOR
         // Remember: This is NOT related to text validation!
         // This is Unity's own OnValidate method which is invoked when changing values in the Inspector.
         protected override void OnValidate()
@@ -993,7 +986,7 @@ namespace TMPro
             if (m_AllowInput)
                 SetCaretActive();
         }
-#endif // if UNITY_EDITOR
+        #endif // if UNITY_EDITOR
 
         protected override void OnEnable()
         {
@@ -1122,9 +1115,9 @@ namespace TMPro
                     caretPositionInternal = GetCaretPositionFromStringIndex(stringPositionInternal);
                     caretSelectPositionInternal = GetCaretPositionFromStringIndex(stringSelectPositionInternal);
 
-#if TMP_DEBUG_MODE
+                    #if TMP_DEBUG_MODE
                     Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+                    #endif
                 }
 
                 if (m_VerticalScrollbar)
@@ -1466,7 +1459,7 @@ namespace TMPro
                     return;
                 }
 
-#if ENABLE_INPUT_SYSTEM
+                #if ENABLE_INPUT_SYSTEM
                 if (m_ProcessingEvent != null && m_ProcessingEvent.rawType == EventType.MouseDown && m_ProcessingEvent.button == 0)
                 {
                     // Check for Double Click
@@ -1492,7 +1485,7 @@ namespace TMPro
                         return;
                     }
                 }
-#else
+                #else
                 if (Input.GetKeyDown(KeyCode.Mouse0))
                 {
                     // Check for Double Click
@@ -1518,7 +1511,7 @@ namespace TMPro
                         return;
                     }
                 }
-#endif
+                #endif
             }
 
             UpdateMaskRegions();
@@ -1535,18 +1528,15 @@ namespace TMPro
                 if (m_SoftKeyboard != null)
                 {
                     if (!m_ReadOnly)
-                    {
                         text = m_SoftKeyboard.text;
-                        Debug.Log("text prev = " + text);
-
-                    }
 
                     if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.LostFocus)
                         SendTouchScreenKeyboardStatusChanged();
 
                     if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
                     {
-                        //m_WasCanceled = true;
+                        m_ReleaseSelection = true;
+                        m_WasCanceled = true;
                         SendTouchScreenKeyboardStatusChanged();
                     }
 
@@ -1561,11 +1551,8 @@ namespace TMPro
                 OnDeselect(null);
                 return;
             }
-            Debug.Log("text = " + text);
-            Debug.Log("m_Text xx = " + m_Text);
 
             string val = m_SoftKeyboard.text;
-            Debug.Log("m_SoftKeyboard.val = " + val);
 
             if (m_Text != val)
             {
@@ -1619,7 +1606,7 @@ namespace TMPro
             {
                 UpdateStringPositionFromKeyboard();
             }
-            Debug.Log("m_Text yy = " + m_Text);
+
             //else if (m_HideMobileInput) // m_Keyboard.canSetSelection
             //{
             //    int length = stringPositionInternal < stringSelectPositionInternal ? stringSelectPositionInternal - stringPositionInternal : stringPositionInternal - stringSelectPositionInternal;
@@ -1632,12 +1619,11 @@ namespace TMPro
 
             if (m_SoftKeyboard != null && m_SoftKeyboard.status != TouchScreenKeyboard.Status.Visible)
             {
-                // if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
-                // m_WasCanceled = true;
+                if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
+                    m_WasCanceled = true;
 
                 OnDeselect(null);
             }
-            Debug.Log("m_Text zz = " + m_Text);
         }
 
         private bool MayDrag(PointerEventData eventData)
@@ -1701,9 +1687,9 @@ namespace TMPro
 
             eventData.Use();
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
         IEnumerator MouseDragOutsideRect(PointerEventData eventData)
@@ -1772,12 +1758,12 @@ namespace TMPro
                 }
             }
 
-#if ENABLE_INPUT_SYSTEM
+            #if ENABLE_INPUT_SYSTEM
             Event.PopEvent(m_ProcessingEvent);
             bool shift = m_ProcessingEvent != null && (m_ProcessingEvent.modifiers & EventModifiers.Shift) != 0;
-#else
+            #else
             bool shift = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-#endif
+            #endif
 
             // Check for Double Click
             bool isDoubleClick = false;
@@ -1888,9 +1874,9 @@ namespace TMPro
             UpdateLabel();
             eventData.Use();
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
         protected enum EditState
@@ -2025,7 +2011,6 @@ namespace TMPro
                 // Submit
                 case KeyCode.Return:
                 case KeyCode.KeypadEnter:
-                case KeyCode.Escape:
                     {
                         if (lineType != LineType.MultiLineNewline)
                         {
@@ -2033,6 +2018,13 @@ namespace TMPro
                             return EditState.Finish;
                         }
                         break;
+                    }
+
+                case KeyCode.Escape:
+                    {
+                        m_ReleaseSelection = true;
+                        m_WasCanceled = true;
+                        return EditState.Finish;
                     }
             }
 
@@ -2217,7 +2209,7 @@ namespace TMPro
             // Determine the current scroll position of the text within the viewport
             Rect viewportRect = m_TextViewport.rect;
 
-            float scrollPosition = (m_TextComponent.textInfo.lineInfo[0].ascender - viewportRect.yMax + m_TextComponent.rectTransform.anchoredPosition.y) / (m_TextComponent.preferredHeight - viewportRect.height);
+            float scrollPosition = (m_TextComponent.textInfo.lineInfo[0].ascender - viewportRect.yMax + m_TextComponent.rectTransform.anchoredPosition.y) / ( m_TextComponent.preferredHeight - viewportRect.height);
 
             scrollPosition = (int)((scrollPosition * 1000) + 0.5f) / 1000.0f;
 
@@ -2273,9 +2265,9 @@ namespace TMPro
                 stringPositionInternal = stringSelectPositionInternal = Mathf.Max(stringPositionInternal, stringSelectPositionInternal);
                 caretPositionInternal = caretSelectPositionInternal = GetCaretPositionFromStringIndex(stringSelectPositionInternal);
 
-#if TMP_DEBUG_MODE
+                #if TMP_DEBUG_MODE
                     Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+                #endif
                 return;
             }
 
@@ -2313,9 +2305,9 @@ namespace TMPro
                     caretSelectPositionInternal = caretPositionInternal = GetCaretPositionFromStringIndex(stringSelectPositionInternal);
             }
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + "  Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + "  String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
         private int FindPrevWordBegin()
@@ -2342,9 +2334,9 @@ namespace TMPro
                 stringPositionInternal = stringSelectPositionInternal = Mathf.Min(stringPositionInternal, stringSelectPositionInternal);
                 caretPositionInternal = caretSelectPositionInternal = GetCaretPositionFromStringIndex(stringSelectPositionInternal);
 
-#if TMP_DEBUG_MODE
+                #if TMP_DEBUG_MODE
                     Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+                #endif
                 return;
             }
 
@@ -2359,7 +2351,7 @@ namespace TMPro
                     if (stringSelectPositionInternal > 0 && char.IsLowSurrogate(text[stringSelectPositionInternal - 1]))
                         position = stringSelectPositionInternal - 2;
                     else
-                        position = stringSelectPositionInternal - 1;
+                        position =  stringSelectPositionInternal - 1;
                 }
                 else
                 {
@@ -2384,9 +2376,9 @@ namespace TMPro
                     caretSelectPositionInternal = caretPositionInternal = GetCaretPositionFromStringIndex(stringSelectPositionInternal);
             }
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + "  Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + "  String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
 
@@ -2499,7 +2491,7 @@ namespace TMPro
         }
 
 
-        private int PageUpCharacterPosition(int originalPos, bool goToFirstChar)
+         private int PageUpCharacterPosition(int originalPos, bool goToFirstChar)
         {
             if (originalPos >= m_TextComponent.textInfo.characterCount)
                 originalPos -= 1;
@@ -2563,7 +2555,7 @@ namespace TMPro
         }
 
 
-        private int PageDownCharacterPosition(int originalPos, bool goToLastChar)
+         private int PageDownCharacterPosition(int originalPos, bool goToLastChar)
         {
             if (originalPos >= m_TextComponent.textInfo.characterCount)
                 return m_TextComponent.textInfo.characterCount - 1;
@@ -2654,9 +2646,9 @@ namespace TMPro
                 stringSelectPositionInternal = stringPositionInternal = GetStringIndexFromCaretPosition(caretSelectPositionInternal);
             }
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
         private void MoveUp(bool shift)
@@ -2687,9 +2679,9 @@ namespace TMPro
                 stringSelectPositionInternal = stringPositionInternal = GetStringIndexFromCaretPosition(caretSelectPositionInternal);
             }
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
 
@@ -2739,9 +2731,9 @@ namespace TMPro
                 AssignPositioningIfNeeded();
             }
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
 
         }
 
@@ -2753,7 +2745,7 @@ namespace TMPro
 
         private void MovePageDown(bool shift, bool goToLastChar)
         {
-            if (hasSelection && !shift)
+             if (hasSelection && !shift)
             {
                 // If we have a selection and press down without shift,
                 // set caret to end of selection before we move it down.
@@ -2791,9 +2783,9 @@ namespace TMPro
                 AssignPositioningIfNeeded();
             }
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
 
         }
 
@@ -2845,9 +2837,9 @@ namespace TMPro
                 }
             }
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
         /// <summary>
@@ -2902,9 +2894,9 @@ namespace TMPro
                 }
             }
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
         /// <summary>
@@ -2972,9 +2964,9 @@ namespace TMPro
 
             }
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
 
@@ -3097,9 +3089,9 @@ namespace TMPro
             UpdateTouchKeyboardFromEditChanges();
             SendOnValueChanged();
 
-#if TMP_DEBUG_MODE
+            #if TMP_DEBUG_MODE
                 Debug.Log("Caret Position: " + caretPositionInternal + " Selection Position: " + caretSelectPositionInternal + "  String Position: " + stringPositionInternal + " String Select Position: " + stringSelectPositionInternal);
-#endif
+            #endif
         }
 
         private void UpdateTouchKeyboardFromEditChanges()
@@ -3197,9 +3189,9 @@ namespace TMPro
                     Delete();
 
                     if (m_RichText)
-                        fullText = text.Substring(0, m_StringPosition) + "<u>" + compositionString + "</u>" + text.Substring(m_StringPosition);
+                        fullText = text.Substring(0, m_StringPosition) +  "<u>" + compositionString + "</u>" + text.Substring(m_StringPosition);
                     else
-                        fullText = text.Substring(0, m_StringPosition) + compositionString + text.Substring(m_StringPosition);
+                        fullText = text.Substring(0, m_StringPosition) +  compositionString + text.Substring(m_StringPosition);
 
                     m_IsCompositionActive = true;
 
@@ -3340,7 +3332,7 @@ namespace TMPro
         /// Adjusts the relative position of the body of the text relative to the viewport.
         /// </summary>
         /// <param name="relativePosition"></param>
-        void AdjustTextPositionRelativeToViewport(float relativePosition)
+        void AdjustTextPositionRelativeToViewport (float relativePosition)
         {
             if (m_TextViewport == null)
                 return;
@@ -3448,10 +3440,10 @@ namespace TMPro
 
         private void MarkGeometryAsDirty()
         {
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             if (!Application.isPlaying || UnityEditor.PrefabUtility.IsPartOfPrefabAsset(this))
                 return;
-#endif
+            #endif
 
             CanvasUpdateRegistry.RegisterCanvasElementForGraphicRebuild(this);
         }
@@ -3474,10 +3466,10 @@ namespace TMPro
 
         private void UpdateGeometry()
         {
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             if (!Application.isPlaying)
                 return;
-#endif
+            #endif
 
             // No need to draw a cursor on mobile as its handled by the devices keyboard.
             if (InPlaceEditing() == false)
@@ -4076,9 +4068,9 @@ namespace TMPro
 
                 // Cache the value of isInPlaceEditingAllowed, because on UWP this involves calling into native code
                 // The value only needs to be updated once when the TouchKeyboard is opened.
-#if UNITY_2019_1_OR_NEWER
+                #if UNITY_2019_1_OR_NEWER
                 m_TouchKeyboardAllowsInPlaceEditing = TouchScreenKeyboard.isInPlaceEditingAllowed;
-#endif
+                #endif
             }
             else
             {
@@ -4089,7 +4081,8 @@ namespace TMPro
             }
 
             m_AllowInput = true;
-            // m_WasCanceled = false;
+            m_OriginalText = text;
+            m_WasCanceled = false;
             SetCaretVisible();
             UpdateLabel();
         }
@@ -4097,7 +4090,7 @@ namespace TMPro
         public override void OnSelect(BaseEventData eventData)
         {
             //Debug.Log("OnSelect()");
-            mOnSelectString = this.text;
+
             base.OnSelect(eventData);
             SendOnFocus();
 
@@ -4133,7 +4126,7 @@ namespace TMPro
 
         public void DeactivateInputField(bool clearSelection = false)
         {
-            Debug.Log("Deactivate Input Field...");
+            //Debug.Log("Deactivate Input Field...");
 
             // Not activated do nothing.
             if (!m_AllowInput)
@@ -4147,11 +4140,9 @@ namespace TMPro
 
             if (m_TextComponent != null && IsInteractable())
             {
-                //if (m_WasCanceled && m_RestoreOriginalTextOnEscape)
-                //    text = m_OriginalText;
-                //if (m_WasCanceled)
-                //  text = this.text;
-                Debug.Log("text: " + text);
+                if (m_WasCanceled && m_RestoreOriginalTextOnEscape)
+                    text = m_OriginalText;
+
                 if (m_SoftKeyboard != null)
                 {
                     m_SoftKeyboard.active = false;
@@ -4180,7 +4171,7 @@ namespace TMPro
         public override void OnDeselect(BaseEventData eventData)
         {
             DeactivateInputField();
-            mOnSelectString = null;
+
             base.OnDeselect(eventData);
             SendOnFocusLost();
         }
