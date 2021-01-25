@@ -506,6 +506,7 @@ namespace TMPro
             }
         }
 
+        string mOnSelectString = null;
         /// <summary>
         /// Set Input field's current text value without invoke onValueChanged. This is not necessarily the same as what is visible on screen.
         /// </summary>
@@ -520,6 +521,11 @@ namespace TMPro
             Debug.Log("this.text : " + this.text);
             if (this.text == value)
                 return;
+
+            if (mOnSelectString == value)
+            {
+                return;
+            }
 
             if (value == null)
                 value = "";
@@ -4080,7 +4086,7 @@ namespace TMPro
         public override void OnSelect(BaseEventData eventData)
         {
             //Debug.Log("OnSelect()");
-
+            mOnSelectString = this.text;
             base.OnSelect(eventData);
             SendOnFocus();
 
@@ -4163,7 +4169,7 @@ namespace TMPro
         public override void OnDeselect(BaseEventData eventData)
         {
             DeactivateInputField();
-
+            mOnSelectString = null;
             base.OnDeselect(eventData);
             SendOnFocusLost();
         }
