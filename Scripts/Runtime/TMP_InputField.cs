@@ -744,6 +744,17 @@ namespace TMPro
         private GameObject m_PreviouslySelectedObject;
 
         /// <summary>
+        /// Controls whether the original text is restored when pressing "ESC".
+        /// </summary>
+        public bool restoreOriginalTextOnEscape
+        {
+            get { return m_RestoreOriginalTextOnEscape; }
+            set { m_RestoreOriginalTextOnEscape = value; }
+        }
+        [SerializeField]
+        private bool m_RestoreOriginalTextOnEscape = true;
+
+        /// <summary>
         /// Is Rich Text editing allowed?
         /// </summary>
         public bool isRichTextEditingAllowed
