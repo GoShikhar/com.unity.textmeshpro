@@ -2021,7 +2021,7 @@ namespace TMPro
                 case KeyCode.Escape:
                     {
                         m_ReleaseSelection = true;
-                        m_WasCanceled = true;
+                        // m_WasCanceled = true;
                         return EditState.Finish;
                     }
             }
@@ -4123,7 +4123,7 @@ namespace TMPro
 
         public void DeactivateInputField(bool clearSelection = false)
         {
-            //Debug.Log("Deactivate Input Field...");
+            Debug.Log("Deactivate Input Field...");
 
             // Not activated do nothing.
             if (!m_AllowInput)
