@@ -4131,7 +4131,7 @@ namespace TMPro
             {
                 //if (m_WasCanceled && m_RestoreOriginalTextOnEscape)
                 //    text = m_OriginalText;
-
+                Debug.Log(text);
                 if (m_SoftKeyboard != null)
                 {
                     m_SoftKeyboard.active = false;
