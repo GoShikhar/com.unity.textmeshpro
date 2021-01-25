@@ -313,7 +313,7 @@ namespace TMPro
         private Coroutine m_BlinkCoroutine = null;
         private float m_BlinkStartTime = 0.0f;
         private Coroutine m_DragCoroutine = null;
-        private bool m_WasCanceled = false;
+        //private bool m_WasCanceled = false;
         private bool m_HasDoneFocusTransition = false;
         private WaitForSecondsRealtime m_WaitForSecondsRealtime;
         private bool m_PreventCallback = false;
@@ -816,7 +816,7 @@ namespace TMPro
         public bool multiLine { get { return m_LineType == LineType.MultiLineNewline || lineType == LineType.MultiLineSubmit; } }
         // Not shown in Inspector.
         public char asteriskChar { get { return m_AsteriskChar; } set { if (SetPropertyUtility.SetStruct(ref m_AsteriskChar, value)) UpdateLabel(); } }
-        public bool wasCanceled { get { return m_WasCanceled; } }
+        //public bool wasCanceled { get { return m_WasCanceled; } }
 
 
         protected void ClampStringPos(ref int pos)
@@ -1530,7 +1530,7 @@ namespace TMPro
                     if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
                     {
                         m_ReleaseSelection = true;
-                        m_WasCanceled = true;
+                        //m_WasCanceled = true;
                         SendTouchScreenKeyboardStatusChanged();
                     }
 
@@ -1616,8 +1616,8 @@ namespace TMPro
 
             if (m_SoftKeyboard != null && m_SoftKeyboard.status != TouchScreenKeyboard.Status.Visible)
             {
-                if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
-                    m_WasCanceled = true;
+                // if (m_SoftKeyboard.status == TouchScreenKeyboard.Status.Canceled)
+                // m_WasCanceled = true;
 
                 OnDeselect(null);
             }
@@ -4073,7 +4073,7 @@ namespace TMPro
             }
 
             m_AllowInput = true;
-            m_WasCanceled = false;
+            // m_WasCanceled = false;
             SetCaretVisible();
             UpdateLabel();
         }
@@ -4133,8 +4133,8 @@ namespace TMPro
             {
                 //if (m_WasCanceled && m_RestoreOriginalTextOnEscape)
                 //    text = m_OriginalText;
-                if (m_WasCanceled)
-                    text = this.text;
+                //if (m_WasCanceled)
+                //  text = this.text;
                 Debug.Log("text: " + text);
                 if (m_SoftKeyboard != null)
                 {
