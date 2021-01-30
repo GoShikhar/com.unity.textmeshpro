@@ -516,7 +516,6 @@ namespace TMPro
         }
 
         string mOnSelectString = null;
-
         void SetText(string value, bool sendCallback = true)
         {
             if (this.text == value)
@@ -742,6 +741,17 @@ namespace TMPro
         private bool m_ReleaseSelection = false;
 
         private GameObject m_PreviouslySelectedObject;
+
+        /// <summary>
+        /// Controls whether the original text is restored when pressing "ESC".
+        /// </summary>
+        public bool restoreOriginalTextOnEscape
+        {
+            get { return m_RestoreOriginalTextOnEscape; }
+            set { m_RestoreOriginalTextOnEscape = value; }
+        }
+        [SerializeField]
+        private bool m_RestoreOriginalTextOnEscape = true;
 
         /// <summary>
         /// Is Rich Text editing allowed?
@@ -4136,6 +4146,9 @@ namespace TMPro
 
             if (m_TextComponent != null && IsInteractable())
             {
+                //if (m_WasCanceled && m_RestoreOriginalTextOnEscape)
+                //    text = m_OriginalText;
+
                 if (m_SoftKeyboard != null)
                 {
                     m_SoftKeyboard.active = false;
