@@ -103,12 +103,12 @@ namespace TMPro
     public enum FontStyles { Normal = 0x0, Bold = 0x1, Italic = 0x2, Underline = 0x4, LowerCase = 0x8, UpperCase = 0x10, SmallCaps = 0x20, Strikethrough = 0x40, Superscript = 0x80, Subscript = 0x100, Highlight = 0x200 };
     public enum FontWeight { Thin = 100, ExtraLight = 200, Light = 300, Regular = 400, Medium = 500, SemiBold = 600, Bold = 700, Heavy = 800, Black = 900 };
 
-    public Action onTextChanged = null;
     /// <summary>
     /// Base class which contains common properties and functions shared between the TextMeshPro and TextMeshProUGUI component.
     /// </summary>
     public abstract class TMP_Text : MaskableGraphic
     {
+        public Action OnTextChanged = null;
         /// <summary>
         /// A string containing the text to be displayed.
         /// </summary>
@@ -132,9 +132,9 @@ namespace TMPro
                 m_havePropertiesChanged = true;
                 SetVerticesDirty();
                 SetLayoutDirty();
-                if (onTextChanged != null)
+                if (OnTextChanged != null)
                 {
-                    onTextChanged.Invoke();
+                    OnTextChanged.Invoke();
                 }
             }
         }
